@@ -1,6 +1,10 @@
 
 
+=== Mon Jul 17 00:07:13 2023
+=======
+
 === Tue Jul  4 18:15:38 2023
+
 
 Packages were changed.
 Update Mode: updateDependencies
@@ -10,6 +14,8 @@ The following packages were added:
   com.unity.2d.tilemap@1.0.0
   com.unity.ads@3.7.5
   com.unity.analytics@3.6.12
+
+=======
 =======
 === Tue Jul  4 12:05:43 2023
 
@@ -17,6 +23,7 @@ Packages were changed.
 Update Mode: resetToDefaultDependencies
 
 The following packages were added:
+
 
   com.unity.collab-proxy@1.15.18
   com.unity.ide.rider@3.0.14
@@ -57,6 +64,10 @@ The following packages were added:
   com.unity.purchasing@4.1.5
 =======
 
+  com.unity.purchasing@4.1.5
+=======
+
+
   com.unity.test-framework@1.1.31
   com.unity.textmeshpro@3.0.6
   com.unity.timeline@1.6.4
@@ -64,5 +75,9 @@ The following packages were added:
 
   com.unity.xr.legacyinputhelpers@2.1.9
 =======
+
+  com.unity.xr.legacyinputhelpers@2.1.9
+=======
   com.unity.visualscripting@1.7.8
+
 
