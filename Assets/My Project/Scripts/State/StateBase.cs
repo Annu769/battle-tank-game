@@ -5,59 +5,26 @@ using System;
 
 namespace BattleTank
 {
-	public class StateBase
-	{
-		public enum STATE
-		{
-			IDLE,
-			PATROL,
-			CHASE,
-			SHOOT
-		}
+    [RequireComponent(typeof(EnemyView))]
+    public class StateBase : MonoBehaviour
+    {
+        protected EnemyView enemyView;
 
-		public enum EVENT
-		{
-			ENTER,
-			UPDATE,
-			EXIT
-		}
+        private void Awake()
+        {
+            enemyView = GetComponent<EnemyView>();
+        }
 
-		protected STATE name;
-		protected EVENT stage;
+        public virtual void OnStateEnter()
+        {
+            this.enabled = true;
+        }
 
-		protected StateBase nextState;
-		protected EnemyController enemy;
-		protected Transform player;
-		protected NavMeshAgent agent;
+        public virtual void OnStateExit()
+        {
+            this.enabled = false;
+        }
 
-		public StateBase(EnemyController enemy)
-		{
-			this.enemy = enemy;
-			stage = EVENT.ENTER;
-			if (TankService.Instance.tankView == null)
-            {
-				return;
-            }
-            else {
-				player = TankService.Instance.tankView.transform;
-			}
-				
-		}
-
-		public virtual void Enter() { stage = EVENT.UPDATE; }
-		public virtual void Update() { stage = EVENT.UPDATE; }
-		public virtual void Exit() { stage = EVENT.EXIT; }
-
-		public StateBase Process()
-		{
-			if (stage == EVENT.ENTER) Enter();
-			if (stage == EVENT.UPDATE) Update();
-			if (stage == EVENT.EXIT)
-			{
-				Exit();
-				return nextState;
-			}
-			return this;
-		}
+        public virtual void Tick() { }
     }
 }

@@ -1,68 +1,70 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BattleTank
 {
 	public class Idle : StateBase
 	{
-		public Idle(EnemyController enemy) : base(enemy)
-		{
-			name = STATE.IDLE;
-		}
+        private Rigidbody rb;
+        private NavMeshAgent agent;
+        private Transform playerTransform;
 
-		public override void Enter()
-		{
-			base.Enter();
-		}
+        private float timeElapsed;
+        private float distanceToPlayer;
 
-		public override void Update()
-		{
-			if (IsPlayerInChaseRange())
-			{
-				MoveToChaseState();
-				return;
-			}
+        [SerializeField] private float timeToWait = 2f;
 
-			if (IsEnemyAwayFromSpawn())
-			{
-				// Go back to original position
-				enemy.GetEnemyAgent().SetDestination(enemy.spawnPoint);
-			}
-			else
-			{
-				// 10 in 5000 chance that enemy goes to Patrol state
-				if (Random.Range(0, 5000) < 10)
-				{
-					nextState = new PatrolingState(enemy);
-					stage = EVENT.EXIT;
-				}
-			}
-		}
+        public override void OnStateEnter()
+        {
+            base.OnStateEnter();
 
-		private void MoveToChaseState()
-		{
-			nextState = new ChasingState(enemy);
-			stage = EVENT.EXIT;
-		}
-		private bool IsPlayerInChaseRange()
-		{
-			if (player == null)
-				return false;
+            timeElapsed = 0f;
+            rb = enemyView.GetRigidbody();
+            playerTransform = enemyView.GetPlayerTransform();
+        }
 
-			float distance = Vector3.Distance(
-				enemy.GetPosition(),
-				player.position);
-			if (distance < 15)
-				return true;
+        public override void OnStateExit()
+        {
+            base.OnStateExit();
+        }
 
-			return false;
-		}
-		private bool IsEnemyAwayFromSpawn() =>
-			Vector3.Distance(enemy.GetPosition(), enemy.spawnPoint) > 0.5;
-		public override void Exit()
-		{
-			base.Exit();
-		}
-	}
+        public override void Tick()
+        {
+            base.Tick();
+
+            if (playerTransform)
+                CheckForChaseOrAttack();
+
+            if (IdleTimeLimitReached())
+                enemyView.ChangeState(enemyView.patrolingState);
+        }
+
+        private void CheckForChaseOrAttack()
+        {
+            distanceToPlayer = Vector3.Distance(playerTransform.position, rb.transform.position);
+
+            if (distanceToPlayer < enemyView.GetEnemyDetectionRange())
+            {
+                enemyView.ChangeState(enemyView.chasingState);
+                return;
+            }
+            else if (distanceToPlayer < enemyView.GetEnemyVisibilityRange())
+            {
+                enemyView.ChangeState(enemyView.shootState);
+                return;
+            }
+        }
+
+        private bool IdleTimeLimitReached()
+        {
+            timeElapsed += Time.deltaTime;
+
+            if (timeElapsed > timeToWait)
+                return true;
+            else
+                return false;
+        }
+    }
 }

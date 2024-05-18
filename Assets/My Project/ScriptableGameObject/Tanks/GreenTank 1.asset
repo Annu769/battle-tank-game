@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: GreenTank 1
   m_EditorClassIdentifier: 
   tankType: 1
+  tankView: {fileID: 7374675415154825580, guid: fdfa6cbfef347034ca50c5733082d448,
+    type: 3}
   maxhealth: 100
-  speed: 1000
+  speed: 400
   Damage: 12
   color: {fileID: 2100000, guid: 12c120f2400576c4f97a98bcca5529bc, type: 2}

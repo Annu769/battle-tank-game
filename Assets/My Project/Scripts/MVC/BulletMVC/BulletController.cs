@@ -5,41 +5,66 @@ namespace BattleTank
 {
     public class BulletController
     {
-        private BulletView bulletView;
         private BulletModel bulletModel;
-        private ParticleSystem Sellexposions;
+        private BulletView bulletView;
         private Rigidbody rb;
-        public BulletController(BulletModel _BulletModel, BulletView _BulletView, Transform GunSpawn)
+
+        public BulletController(BulletScriptableObject _bullet)
         {
-            bulletModel = _BulletModel;
-            bulletView = GameObject.Instantiate<BulletView>(_BulletView, GunSpawn.position, GunSpawn.rotation);
-            GameObject gameObject = bulletView.GetParticalEffect();
-            gameObject = GameObject.Instantiate(bulletModel.Partical);
+            bulletView = GameObject.Instantiate<BulletView>(_bullet.bulletView);
+            bulletModel = new BulletModel(_bullet);
+
             bulletView.SetBulletController(this);
             bulletModel.SetBulletController(this);
+
             rb = bulletView.GetRigidbody();
         }
-        public void IsSetActive(bool isActive)
-        {
-            bulletView.ToggelActive(isActive);
-        }
-        public void ShootBullet(Transform bulletSpawnPoint)
-        {
-            rb.transform.position = bulletSpawnPoint.position;
-            rb.transform.rotation = bulletSpawnPoint.rotation;
-            rb.AddForce(rb.transform.forward * bulletModel.Speed, ForceMode.VelocityChange);
-        }
-        public void ReturnBulletToPool()
-        {
-            bulletView.GetComponent<MeshRenderer>().enabled = true;
-            IsSetActive(false);
-            BulletService.Instance.poolService.ReturnItem(this);
 
-            if (Sellexposions != null)
-            {
-                Sellexposions.gameObject.SetActive(false);
-                Sellexposions.Stop(true);
-            }
+        public void SetBulletTankType(TankType tankType)
+        {
+            bulletModel.SetTankType(tankType);
+        }
+
+        public void Shoot()
+        {
+            rb.AddForce(rb.transform.forward * bulletModel.range, ForceMode.Impulse);
+        }
+
+        public void BulletCollision(Vector3 position)
+        {
+            rb.rotation = Quaternion.identity;
+
+            BulletService.Instance.BulletExplosion(this, position);
+        }
+
+        public int GetBulletDamage()
+        {
+            return bulletModel.damage;
+        }
+
+        public TankType GetTankType()
+        {
+            return bulletModel.tankType;
+        }
+
+        public void EnableBullet(Transform gunTransform)
+        {
+            
+
+            rb.transform.position = gunTransform.position;
+            rb.transform.rotation = gunTransform.rotation;
+
+            rb.gameObject.SetActive(true);
+            Shoot();
+        }
+
+        public void DisableBullet()
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.rotation = Quaternion.identity;
+
+            rb.gameObject.SetActive(false);
         }
     }
 }

@@ -1,54 +1,59 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BattleTank
 {
     public class ChasingState : StateBase
     {
-		public ChasingState(EnemyController enemy) : base(enemy)
-		{
-			name = STATE.CHASE;
-		}
+        private Transform playerTransform;
+        private NavMeshAgent agent;
 
-		public override void Enter()
-		{
-			base.Enter();
-		}
+        private float playerDetectionRange;
 
-		public override void Update()
-		{
-			if (player == null)
-			{
-				MoveToIdleState();
-				return;
-			}
+        public override void OnStateEnter()
+        {
+            base.OnStateEnter();
+            playerTransform = enemyView.GetPlayerTransform();
+            agent = enemyView.GetAgent();
+            playerDetectionRange = enemyView.GetEnemyDetectionRange();
 
-			enemy.GetEnemyAgent().SetDestination(TankService.Instance.tankView.transform.position);
+            agent.SetDestination(playerTransform.position);
+        }
 
-			float distance = Vector3.Distance(
-				enemy.GetPosition(), TankService.Instance.tankView.transform.position);
+        public override void OnStateExit()
+        {
+            base.OnStateExit();
+        }
 
-			if (distance > 20)
-			{
-				MoveToIdleState();
-			}
-			else if (distance < 10)
-			{
-				nextState = new ShootState(enemy);
-				stage = EVENT.EXIT;
-			}
-		}
+        public override void Tick()
+        {
+            base.Tick();
 
-		private void MoveToIdleState()
-		{
-			nextState = new Idle(enemy);
-			stage = EVENT.EXIT;
-		}
+            if (playerTransform == null)
+            {
+                enemyView.ChangeState(enemyView.idelSate);
+                return;
+            }
 
-		public override void Exit()
-		{
-			base.Exit();
-		}
-	}
+            Chase();
+        }
+
+        public void Chase()
+        {
+            if (agent.remainingDistance > playerDetectionRange)
+            {
+                enemyView.ChangeState(enemyView.idelSate);
+            }
+            else if (agent.remainingDistance < enemyView.GetEnemyVisibilityRange())
+            {
+                enemyView.ChangeState(enemyView.shootState);
+            }
+            else
+            {
+                agent.SetDestination(playerTransform.position);
+            }
+        }
+    }
 }

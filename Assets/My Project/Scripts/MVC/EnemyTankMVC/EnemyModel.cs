@@ -1,36 +1,38 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+//using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 namespace BattleTank
 {
     public class EnemyModel
     {
         private EnemyController enemyController;
-        public float speed { get; }
-        public float health { get; }
-        public int strength { get; }
-        public float chasingRadius { get; }
-        public float ShootCoolDown { get; }
-        public float ShootingDistace { get; }
 
+        public int health { get; }
+        public int speed { get; }
+        public int strength { get; }
+        public int bpm { get; }
+
+        public float rotationSpeed { get; }
+        public float visibilityRange { get; }
+        public float detectionRange { get; }
         public EnemyModel(EnemyScriptableObject enemy)
         {
-            speed = enemy.Speed;
-            health = enemy.Health;
-            chasingRadius = enemy.AIVisibilityRadius;
-            ShootCoolDown = enemy.ShootCoolDown;
-            ShootingDistace = enemy.AIShootingDistance;
+            health = enemy.health;
+            speed = enemy.speed;
             strength = enemy.strength;
-
-
-
+            bpm = enemy.bpm;
+            rotationSpeed = enemy.speed / 100f;
+            visibilityRange = enemy.visibilityRange;
+            detectionRange = enemy.detectionRange;
         }
+
         public void SetEnemyController(EnemyController _enemyController)
         {
             enemyController = _enemyController;
         }
-       
+
 
     }
 }

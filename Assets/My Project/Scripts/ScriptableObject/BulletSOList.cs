@@ -5,5 +5,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Datalist", menuName = " ScriptableObject/NewBulletSolist", order = 4)]
 public class BulletSOList : ScriptableObject
 {
-    public List<BulletScriptableObject> bulletList = new List<BulletScriptableObject>();
+    public BulletScriptableObject bulletList;
 }

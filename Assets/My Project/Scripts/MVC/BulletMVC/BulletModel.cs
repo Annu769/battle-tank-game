@@ -6,32 +6,27 @@ namespace BattleTank
 {
     public class BulletModel
     {
-        private BulletScriptableObject bulletSO;
-        public GameObject Partical { get; }
+        public int damage { get; }
+        public int range { get; }
+        public TankType tankType { private set; get; }
 
-        public int Speed { get; }
-        public int Damage { get; }
+        private BulletController bulletController;
 
-        public int lifetime;
-
-        private BulletController bulletController1;
-        public int shostOfBullet;
-        public BulletModel(BulletScriptableObject _bulletSO)
+        public BulletModel(BulletScriptableObject _bullet)
         {
-            bulletSO = _bulletSO;
-            Speed = _bulletSO.Speed;
-            Damage = _bulletSO.Damage;
-            lifetime = _bulletSO.Lifetime;
-            shostOfBullet = _bulletSO.ShotsFired;
-            Partical = _bulletSO.ParticalEffect;
+            damage = _bullet.damage;
+            range = _bullet.range;
+
         }
 
-
-
-
-        public void SetBulletController(BulletController bulletController)
+        public void SetTankType(TankType _tankType)
         {
-            bulletController1 = bulletController;
+            tankType = _tankType;
+        }
+
+        public void SetBulletController(BulletController _bulletController)
+        {
+            bulletController = _bulletController;
         }
     }
 }

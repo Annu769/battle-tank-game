@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: BlueTank
   m_EditorClassIdentifier: 
   tankType: 3
+  tankView: {fileID: 7374675415154825580, guid: 22a03838aafd0a74296a9ec74e7cb70e,
+    type: 3}
   maxhealth: 200
-  speed: 500
+  speed: 300
   Damage: 30
   color: {fileID: 2100000, guid: ff21ff0ea9b18924bb1fdfbb0e58f5cb, type: 2}

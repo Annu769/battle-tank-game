@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b5e9725e9444db48a9ccd1f20fccfb2, type: 3}
   m_Name: Enemy
   m_EditorClassIdentifier: 
-  damageDealt: 25
-  speed: 10
   health: 100
-  aIShootingDistance: 5
-  aIVisibilityRadius: 6
-  shootCoolDown: 4
-  Strength: 150
-  EnemyTank: {fileID: -1924842480735983101, guid: ca795a83e88c20f4b9001b1fb0e1d469,
+  speed: 5
+  strength: 20
+  bpm: 6
+  rotationSpeed: 7
+  visibilityRange: 7
+  detectionRange: 10
+  enemyView: {fileID: -1924842480735983101, guid: ca795a83e88c20f4b9001b1fb0e1d469,
     type: 3}

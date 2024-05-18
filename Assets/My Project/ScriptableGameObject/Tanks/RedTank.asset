@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: RedTank
   m_EditorClassIdentifier: 
   tankType: 2
-  maxhealth: 75
-  speed: 800
-  Damage: 25
+  tankView: {fileID: 7374675415154825580, guid: 62f3d8f1a33aef9469f7ab3602e85806,
+    type: 3}
+  maxhealth: 100
+  speed: 600
+  Damage: 15
   color: {fileID: 2100000, guid: 463052f3f7389124f9e7b34b0b931d0d, type: 2}

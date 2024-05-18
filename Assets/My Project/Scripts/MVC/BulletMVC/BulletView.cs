@@ -6,27 +6,32 @@ namespace BattleTank
 {
     public class BulletView : MonoBehaviour
     {
-        [SerializeField] private Rigidbody bulletrb;
-        private BulletController bulletController1;
-        private GameObject particalEffect;
-        public Rigidbody GetRigidbody() => bulletrb;
-        public GameObject GetParticalEffect() => particalEffect;
+        private BulletController bulletController;
 
-        public void SetBulletController(BulletController bulletController)
+        [SerializeField] private Rigidbody rb;
+
+        public void SetBulletController(BulletController _bulletController)
         {
-            bulletController1 = bulletController;
+            bulletController = _bulletController;
         }
 
-        internal void ToggelActive(bool isActive)
+        public TankType GetTankType()
         {
-            this.gameObject.SetActive(isActive);
+            return bulletController.GetTankType();
         }
-        private void OnCollisionEnter(Collision collision)
-         {
-            if (collision.gameObject.GetComponent<MeshRenderer>()) ;
-             {
-                 bulletController1.ReturnBulletToPool();
-             }
-         }
+
+        public Rigidbody GetRigidbody()
+        {
+            return rb;
+        }
+
+        private void OnCollisionEnter(Collision col)
+        {
+            bulletController.BulletCollision(col.contacts[0].point);
+
+            IDamageable target = col.gameObject.GetComponent<IDamageable>();
+            if (target != null)
+                target.TakeDamage(bulletController.GetBulletDamage());
+        }
     }
 }

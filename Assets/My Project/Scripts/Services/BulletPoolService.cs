@@ -5,16 +5,16 @@ namespace BattleTank
 {
     public class BulletPoolService : GenericPoolService<BulletController>
     {
-        private BulletView bulletView;
-        public BulletController GetBullet(BulletView _bulletView)
+        private BulletScriptableObject _bulletScriptable;
+        public BulletController GetBullet(BulletScriptableObject bulletScriptable)
         {
-            bulletView = _bulletView;
+            _bulletScriptable = bulletScriptable;
             return GetItem();
         }
         protected override BulletController CreateItem()
         {
-            BulletService.Instance.BulletRandomizer();
-            BulletController bullet = new BulletController(new BulletModel(BulletService.Instance.BulletRandomizer()), bulletView, TankService.Instance.GetbulletTransform());
+            
+            BulletController bullet = new BulletController(_bulletScriptable);
             return bullet;
         }
     }

@@ -1,4 +1,5 @@
 using System;
+using BattleTank;
 using UnityEngine;
 
 
@@ -7,6 +8,7 @@ public class TankTypeScriptableObject : ScriptableObject
 {
     [Header("Proprties")]
     public TankType tankType;
+    public TankView tankView;
  
     public int maxhealth;
 

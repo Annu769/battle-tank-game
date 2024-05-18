@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 namespace BattleTank
 {
     public class TankView : MonoBehaviour, IDamageable
@@ -8,30 +9,29 @@ namespace BattleTank
         [SerializeField] private Rigidbody rb;
         [SerializeField] private Transform bulletSpawnPoint;
         [SerializeField] private Transform tankBody;
+        [SerializeField] private Slider healthBar;
         private TankController tankController;
         public Transform GetBulletSpawnPoint() => bulletSpawnPoint;
         private void Start()
         {
             rb = GetComponent<Rigidbody>();
-            CameraFollow();
-        }
-        private void CameraFollow()
-        {
-            GameObject gameObject1 = GameObject.Find("Main Camera");
-            GameObject cam = gameObject1;
-            cam.transform.SetParent(transform);
-            cam.transform.position = new Vector3(0f, 12f, -15);
-            cam.transform.rotation *= Quaternion.Euler(40f, 0f, 0f);
+            if(rb != null)
+            {
+                rb.freezeRotation = true;
+            }
+            Debug.Log(healthBar.value);
         }
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
+                Debug.Log(tankController);
+                Debug.Log(bulletSpawnPoint);
                 tankController.Shoot(bulletSpawnPoint);
             }
         }
         private void FixedUpdate()
-        {
+        {        
             tankController.TankMove();
         }
         public void SetTankController(TankController _tankController)
@@ -54,6 +54,10 @@ namespace BattleTank
         {
             tankController.TakeDamage(Damage);
         }
+        public Slider GetHealthBar()
+        {
+            return healthBar;
+        }
         void OnCollisionEnter(Collision col)
         {
             if (col.gameObject.GetComponent<EnemyView>() != null)
@@ -61,6 +65,10 @@ namespace BattleTank
                 EnemyView enemyView = col.gameObject.GetComponent<EnemyView>();
                 tankController.TakeDamage(enemyView.GetEnemyStrength());
             }
+        }
+        public void AddHeal(int healamount)
+        {
+            tankController.Heal(healamount);
         }
     }
 }

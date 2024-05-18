@@ -5,45 +5,34 @@ using BattleTank;
 
 public class CameraController : MonoBehaviour
 {
-   
-    private Transform playertransform;
-    [SerializeField] Camera mainCamera;
-    [SerializeField] float zoomOutSpeed = 0.05f;
-    [SerializeField] float offsetLevel = 0.01f;
-    Vector3 currentPos;
-    private void Start()
+
+    private Transform player;
+    private Vector3 currentPos;
+
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private float maxCameraSize = 19f;
+    [SerializeField] private float zoomOutSpeed = 0.05f;
+    [SerializeField] private float offsetLevel = 0.01f;
+
+    public void SetTankTransform(Transform _transform)
     {
-        playertransform = gameObject.transform.Find("Player");
-        if (playertransform == null)
-        {
-            Debug.Log("Player Not Found");
-        }
-        else
-        {
-            Debug.LogError("Player Found");
-        }
-       
+        player = _transform;
+        if (player != null)
+            currentPos = player.position;
     }
 
-   public void SetTankTransform(Transform _transform)
+    private void LateUpdate()
     {
-        playertransform = _transform;
-        if (playertransform != null)
+        if (player != null)
         {
-            currentPos = playertransform.position;
+            transform.position += player.position - currentPos;
+            currentPos = player.position;
         }
     }
-    void LateUpdate()
-    {
-        if (playertransform != null)
-        {
-            transform.position += playertransform.position - currentPos;
-            currentPos = playertransform.position;
-        }
-    }
+
     public IEnumerator ZoomOut()
     {
-        while (mainCamera.orthographicSize < 19)
+        while (mainCamera.orthographicSize < maxCameraSize)
         {
             mainCamera.orthographicSize += offsetLevel;
             yield return new WaitForSeconds(zoomOutSpeed);

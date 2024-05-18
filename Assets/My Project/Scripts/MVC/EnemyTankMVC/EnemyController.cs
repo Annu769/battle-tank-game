@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 namespace BattleTank
 {
     public class EnemyController
     {
-
         public EnemyView enemyView { get; }
         public EnemyModel enemyModel { get; }
         private StateBase enemyState;
@@ -15,23 +15,24 @@ namespace BattleTank
         private Rigidbody rb;
         private float health;
         private float shootCooldown;
+        private Slider _healthBar;
+        private Camera playerCamera;
         public Transform GetEnemyGunPosition() => enemyView.GetGunPosition();
-
         public Transform GetEnemyTankTransform() => enemyView.transform;
         public EnemyController(EnemyScriptableObject enemy, float x = 0, float z = 0)
         {
             enemyView = GameObject.Instantiate<EnemyView>(enemy.enemyView, new Vector3(Random.Range(x, -x), 0, Random.Range(z, -z)), Quaternion.identity);
             enemyModel = new EnemyModel(enemy);
-
             enemyView.SetEnemyController(this);
             enemyModel.SetEnemyController(this);
-            enemyState = new Idle(this);
+            enemyState = new Idle();
             rb = enemyView.GetRigidbody();
             agent = enemyView.GetAgent();
             health = enemyModel.health;
+            _healthBar = enemyView.GetHealthBar();
+            playerCamera = EnemyService.Instance.GetCamera();
+            SetupHealthBar();
         }
-
-
         public void Shoot(Transform gunTransform)
         {
             EnemyService.Instance.ShootBullet(gunTransform);
@@ -39,12 +40,14 @@ namespace BattleTank
         public void TakeDamage(int damage)
         {
             health -= damage;
+            _healthBar.value = health;
             if (health < 0)
                 TankDeath();
         }
         void TankDeath()
         {
             EnemyService.Instance.DestoryEnemy(this);
+            EnemyService.Instance.ItemDrop(enemyView.transform);
         }
        
         public Vector3 GetPosition()
@@ -61,44 +64,30 @@ namespace BattleTank
         }
        private float DistanceBetbeenTank()
         {
-            if(TankService.Instance.GetPlayerTransform() == null)
+            if(TankService.Instance.GetPlayerTansform().position == null)
             {
                 return Mathf.Infinity;
             }
-            float distance = Vector3.Distance(TankService.Instance.GetPlayerTransform(), enemyView.transform.position);
+            float distance = Vector3.Distance(TankService.Instance.GetPlayerTansform().position, enemyView.transform.position);
             return distance;
         }
-        public void MoveAITank()
+
+        public void EnableEnemyTank(Vector3 _newPosition)
         {
-            enemyState = enemyState.Process();
+            health = enemyModel.health; 
+            _healthBar.value = enemyModel.health;
+            enemyView.transform.position = _newPosition;
+            enemyView.transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
+            enemyView.gameObject.SetActive(true);
         }
-        public bool IsPlayerInChaseRange()
+        public Transform PlayerTransform()
         {
-            float distace = DistanceBetbeenTank();
-            if(distace < enemyModel.chasingRadius)
-            {
-                return true;
-            }
-            return false;
+            return TankService.Instance.GetPlayerTansform();
         }
-        public bool IsPlayerInShootRange()
+        private void SetupHealthBar()
         {
-            float distance = DistanceBetbeenTank();
-            if(distance < enemyModel.ShootingDistace)
-            {
-                return true;
-            }
-            return false;
+                _healthBar.maxValue = enemyModel.health; 
         }
-        public void ShootingPlayerTank()
-        {
-            GetEnemyTankTransform().LookAt(TankService.Instance.GetPlayerTransform());
-            shootCooldown += Time.deltaTime;
-            if (shootCooldown >= enemyModel.ShootCoolDown)
-            {
-                shootCooldown = 0;
-               BulletService.Instance.BulletShootByTank(enemyView.GetGunPosition());
-            }
-        }
+
     }
 }

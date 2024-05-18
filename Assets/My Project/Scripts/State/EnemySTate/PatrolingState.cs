@@ -1,72 +1,79 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace BattleTank
 {
 	public class PatrolingState : StateBase
 	{
-		private Vector3 patrolPoint1;
-		private Vector3 patrolPoint2;
-		private Vector3 currentPoint;
+        private Rigidbody rb;
+        private NavMeshAgent agent;
+        private Transform playerTransform;
 
-		public PatrolingState(EnemyController enemy) : base(enemy)
-		{
-			name = STATE.PATROL;
-		}
+        private float distanceToPlayer;
 
-		public override void Enter()
-		{
-			patrolPoint1 = enemy.spawnPoint + enemy.GetEnemyAgent().transform.forward * 5;
-			patrolPoint2 = enemy.spawnPoint - enemy.GetEnemyAgent().transform.forward * 5;
-			currentPoint = patrolPoint1;
-			base.Enter();
-		}
+        [SerializeField] private float randomPointRange = 10f;
+        [SerializeField] private float navmeshPointRange = 2f;
 
-		public override void Update()
-		{
-			if (player != null)
-			{
-				if (IsPlayerInChaseRange())
-				{
-					MoveToChaseState();
-					return;
-				}
-			}
+        public override void OnStateEnter()
+        {
+            base.OnStateEnter();
 
-			Patrolling();
-		}
+            playerTransform = enemyView.GetPlayerTransform();
+            rb = enemyView.GetRigidbody();
+            agent = enemyView.GetAgent();
+        }
 
-		private void MoveToChaseState()
-		{
-			nextState = new ChasingState(enemy);
-			stage = EVENT.EXIT;
-		}
+        public override void OnStateExit()
+        {
+            base.OnStateExit();
+        }
 
-		private bool IsPlayerInChaseRange()
-		{
-			float distance = Vector3.Distance(
-					enemy.GetPosition(),
-					player.position);
-			if (distance < 15)
-				return true;
+        public override void Tick()
+        {
+            base.Tick();
 
-			return false;
-		}
+            Patrol();
+        }
 
-		private void Patrolling()
-		{
-			enemy.GetEnemyAgent().SetDestination(currentPoint);
-			if (Vector3.Distance(enemy.GetPosition(), patrolPoint1) < 0.5)
-				currentPoint = patrolPoint2;
+        private void Patrol()
+        {
+            if (playerTransform != null)
+            {
+                distanceToPlayer = Vector3.Distance(playerTransform.position, rb.transform.position);
 
-			if (Vector3.Distance(enemy.GetPosition(), patrolPoint2) < 0.5)
-				currentPoint = patrolPoint1;
-		}
+                if (distanceToPlayer < enemyView.GetEnemyDetectionRange())
+                {
+                    enemyView.ChangeState(enemyView.chasingState);
+                    return;
+                }
+            }
 
-		public override void Exit()
-		{
-			base.Exit();
-		}
-	}
+            if (agent.remainingDistance <= agent.stoppingDistance)
+            {
+                Vector3 newPosition;
+
+                if (RandomPosition(rb.transform.position, randomPointRange, out newPosition))
+                {
+                    agent.destination = newPosition;
+                }
+            }
+        }
+
+        private bool RandomPosition(Vector3 center, float range, out Vector3 result)
+        {
+            Vector3 randomPosition = center + Random.insideUnitSphere * range;
+            NavMeshHit hit;
+
+            if (NavMesh.SamplePosition(randomPosition, out hit, navmeshPointRange, NavMesh.AllAreas))
+            {
+                result = hit.position;
+                return true;
+            }
+
+            result = Vector3.zero;
+            return false;
+        }
+    }
 }
